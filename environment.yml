@@ -1,0 +1,20 @@
+name: newenv
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.9
+  - biopython
+  - pandas
+  - numpy
+  - regex
+  - snakemake
+  - starcode=1.4
+  - minimap2=2.28
+  - samtools=1.21
+  - bbmap=39.17
+  - pip
+  - pip:
+    - edlib
+    - pyabpoa
