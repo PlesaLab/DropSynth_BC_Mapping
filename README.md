@@ -6,7 +6,7 @@ This repository implements an automated pipeline to process high-throughput Nano
 
 The `Makefile` pipeline consists of the following main steps:
 
-1. **FASTQ File Splitting** (*See split_script.py*)
+1. **FASTQ File Splitting** (*See split_script.py*)   
    Large FASTQ.gz files are split into smaller, more manageable parts using `split_script.py`.
 
 2. **Barcode Extraction and Processing**  
