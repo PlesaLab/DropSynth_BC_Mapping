@@ -29,8 +29,8 @@ The `Makefile` pipeline consists of the following main steps:
    - A consensus gene FASTA file (headers correspond to consensus barcodes)
    - A text file listing consensus scores
 
-7. **Alternative Translation Processing** (*process_alt_trans.py*)   
-   Translate the consensus gene nucleotide sequences into protein sequences using `process_alt_trans.py`, which outputs the results as a CSV file.  
+7. **Consensus Gene Translation** (*process_alt_trans.py*)   
+   Translate the consensus gene nucleotide sequences into protein sequences using `process_alt_trans.py`, which outputs the results as a CSV file for downstream parsing.  
 
 8. **SAM File Parsing and Mutation Analysis** (*parse_sam_script.py*)   
    Finally, the `parse_sam_script.py` script parses a SAM file (default: BBMap) alongside reference protein sequences and barcode information. This step performs pairwise alignments to identify mutations, generate mutant IDs, and output two CSV reports:
@@ -115,9 +115,7 @@ The `Makefile` itself includes targets for:
 - **Assigning consensus barcodes** (`assign_consensus`)
 - **Sorting consensus sequences** (`sort_consensus`)
 - **Generating consensus gene sequences** (`consensus_gene`)
-- **Alternative translation** (`alt_translation`)
+- **Consensus gene translations** (`alt_translation`)
 - **Parsing SAM files for mutation analysis** (`parse_sam`)
 
 To run the full pipeline, simply execute the `consensus_makefile.sh` script. In an HPC environment, submit this script as a batch job where `SLURM_CPUS_PER_TASK` defines the number of threads available.
-
-
