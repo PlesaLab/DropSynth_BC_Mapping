@@ -37,7 +37,7 @@ The `Makefile` pipeline consists of the following main steps:
    - Barcode-to-mutant mapping (`C5seqs_mutID_all.csv`)
    - Aggregated mutant information (`C5seqs_mutID_info_all.csv`)
    - Default Mapping: **BBMAP**
-   - Can change to use **MINIMAP**
+   - Can change to use: **MINIMAP**
 
 ## Dependencies
 
@@ -115,8 +115,8 @@ The `Makefile` itself includes targets for:
 - **Assigning consensus barcodes** (`assign_consensus`)
 - **Sorting consensus sequences** (`sort_consensus`)
 - **Generating consensus gene sequences** (`consensus_gene`)
-- **Parsing SAM files for mutation analysis** (`parse_sam`)
 - **Alternative translation** (`alt_translation`)
+- **Parsing SAM files for mutation analysis** (`parse_sam`)
 
 To run the full pipeline, simply execute the `consensus_makefile.sh` script. In an HPC environment, submit this script as a batch job where `SLURM_CPUS_PER_TASK` defines the number of threads available.
 
