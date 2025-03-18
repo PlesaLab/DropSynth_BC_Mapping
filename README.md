@@ -6,43 +6,38 @@ This repository implements an automated pipeline to process high-throughput Nano
 
 The `Makefile` pipeline consists of the following main steps:
 
-1. **FASTQ File Splitting** (*See split_script.py*)   
+1. **FASTQ File Splitting** (*split_script.py*)   
    Large FASTQ.gz files are split into smaller, more manageable parts using `split_script.py`.
 
-2. **Barcode Extraction and Processing**  
+2. **Barcode Extraction and Processing** (*barcode_processing.py*)   
    The `barcode_processing.py` script reads input FASTQ files, identifies specific barcode regions based on defined motifs, and extracts associated sequences. It outputs:
    - Barcode statistics (`.bc_stats.csv` and `.bc_stats_for_starcode.tsv`)
    - A list of barcode-associated sequences (`.bc_list.csv`)
-   - A sorted FASTA file of sequences without ambiguous sites  
-   *(See [barcode_processing.py](&#8203;:contentReference[oaicite:1]{index=1}))*
+   - A sorted FASTA file of sequences without ambiguous sites
 
-3. **Barcode Clustering (Starcode)**  
-   An external tool (Starcode) is used to cluster similar barcodes. If multiple clustering output files are generated, they can be merged using `starcode_combine.py` to create a unified consensus barcode count file.  
-   *(See [starcode_combine.py](&#8203;:contentReference[oaicite:2]{index=2}))*
+3. **Barcode Clustering (Starcode)** (*starcode_combine.py*)   
+   An external tool (Starcode) is used to cluster similar barcodes. If multiple clustering output files are generated, they can be merged using `starcode_combine.py` to create a unified consensus barcode count file.
 
-4. **Assigning Consensus Barcodes**  
+4. **Assigning Consensus Barcodes** (*add_consensus_bc.py*)   
    The `add_consensus_bc.py` script takes a FASTA file and the Starcode clustering output. It assigns consensus barcodes to each record (updating the headers) and outputs a new FASTA file.  
-   *(See [add_consensus_bc.py](&#8203;:contentReference[oaicite:3]{index=3}))*
 
-5. **Sorting Consensus Sequences**  
-   The resulting consensus FASTA file is sorted alphabetically by header using `sort_consensus_bc.py` to ensure proper ordering for downstream analysis.  
-   *(See [sort_consensus_bc.py](&#8203;:contentReference[oaicite:4]{index=4}))*
+5. **Sorting Consensus Sequences** (*sort_consensus_bc.py*)   
+   The resulting consensus FASTA file is sorted alphabetically by header using `sort_consensus_bc.py` to ensure proper ordering for downstream analysis.
 
-6. **Consensus Gene Generation**  
+6. **Consensus Gene Generation** (*get_consensus_gene.py*)   
    With a sorted FASTA file of consensus barcodes, `get_consensus_gene.py` groups sequences by barcode and aligns them using pyabpoa. For each group, a consensus gene is generated and scored, with results saved as:
    - A consensus gene FASTA file (headers correspond to consensus barcodes)
-   - A text file listing consensus scores  
-   *(See [get_consensus_gene.py](&#8203;:contentReference[oaicite:5]{index=5}))*
+   - A text file listing consensus scores
 
-7. **Alternative Translation Processing**  
-   Optionally, nucleotide sequences can be translated into protein sequences using `process_alt_trans.py`, which outputs the results as a CSV file.  
-   *(See [process_alt_trans.py](&#8203;:contentReference[oaicite:6]{index=6}))*
+7. **Alternative Translation Processing** (*process_alt_trans.py*)   
+   Translate the consensus gene nucleotide sequences into protein sequences using `process_alt_trans.py`, which outputs the results as a CSV file.  
 
-8. **SAM File Parsing and Mutation Analysis**  
-   Finally, the `parse_sam_script.py` script parses a SAM file (generated, for example, by BBMap) alongside reference protein sequences and barcode information. This step performs pairwise alignments to identify mutations, generate mutant IDs, and output two CSV reports:
+8. **SAM File Parsing and Mutation Analysis** (*parse_sam_script.py*)   
+   Finally, the `parse_sam_script.py` script parses a SAM file (default: BBMap) alongside reference protein sequences and barcode information. This step performs pairwise alignments to identify mutations, generate mutant IDs, and output two CSV reports:
    - Barcode-to-mutant mapping (`C5seqs_mutID_all.csv`)
-   - Aggregated mutant information (`C5seqs_mutID_info_all.csv`)  
-   *(See [parse_sam_script.py](&#8203;:contentReference[oaicite:7]{index=7}))*
+   - Aggregated mutant information (`C5seqs_mutID_info_all.csv`)
+   - Default Mapping: **BBMAP**
+   - Can change to use **MINIMAP**
 
 ## Dependencies
 
