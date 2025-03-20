@@ -113,9 +113,9 @@ The `Makefile` itself includes targets for:
 - **Splitting FASTQ files** (`split`)
 - **Processing barcodes** (`process_barcodes`)
 - **Assigning consensus barcodes** (`assign_consensus`)
-- **Sorting consensus sequences** (`sort_consensus`)
+- **Sorting consensus barcodes** (`sort_consensus`)
 - **Generating consensus gene sequences** (`consensus_gene`)
-- **Consensus gene translations** (`alt_translation`)
-- **Parsing SAM files for mutation analysis** (`parse_sam`)
+- **Translating consensus gene sequences** (`alt_translation`)
+- **Parsing SAM files for perfect and mutant variants** (`parse_sam`)
 
 To run the full pipeline, simply execute the `consensus_makefile.sh` script. In an HPC environment, submit this script as a batch job where `SLURM_CPUS_PER_TASK` defines the number of threads available.
