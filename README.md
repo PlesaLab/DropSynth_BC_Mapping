@@ -110,12 +110,16 @@ make -j $SLURM_CPUS_PER_TASK
 
 The `Makefile` itself includes targets for:
 
-- **Splitting FASTQ files** (`split`)
-- **Processing barcodes** (`process_barcodes`)
-- **Assigning consensus barcodes** (`assign_consensus`)
-- **Sorting consensus barcodes** (`sort_consensus`)
-- **Generating consensus gene sequences** (`consensus_gene`)
-- **Translating consensus gene sequences** (`alt_translation`)
-- **Parsing SAM files for perfect and mutant variants** (`parse_sam`)
+- **Splitting FASTQ files** (`split_script.py`)
+- **Processing barcodes** (`barcode_processing.py`)
+- **Clustering barcodes with Starcode** ('starcode_combine.py')
+- **Assigning consensus barcodes** (`add_consensus_bc.py`)
+- **Sorting consensus barcodes** (`sort_consensus_bc.py`)
+- **Generating consensus gene sequences** (`get_consensus_gene.py`)
+- **Translating consensus gene sequences** (`process_alt_trans.py`)
+- **Parsing SAM files for perfect and mutant variants** (`parse_sam_script.py`)
 
 To run the full pipeline, simply execute the `consensus_makefile.sh` script. In an HPC environment, submit this script as a batch job where `SLURM_CPUS_PER_TASK` defines the number of threads available.
+```bash
+sbatch consensus_makefile.sh
+```
