@@ -41,7 +41,8 @@ The `Makefile` pipeline consists of the following main steps:
 
 ## Dependencies
 
-This pipeline uses the following dependencies, which can be installed via Conda using the provided `environment.yml` file:
+> [!NOTE]
+> This pipeline uses the following dependencies, which can be installed via Conda using the provided `environment.yml` file:
 
 - **Python 3.9**
 - **biopython** – for sequence handling and FASTA/FASTQ parsing
