@@ -68,7 +68,7 @@ conda activate newenv
 ## Makefile Targets and Running the Pipeline
 
 > [!NOTE]
-> The workflow is orchestrated via a Makefile. To facilitate running the entire pipeline in a high-performance computing environment, a shell script named `consensus_makefile.sh` is provided. This script performs the following steps:
+> The workflow is orchestrated via a `Makefile`. To facilitate running the entire pipeline in a high-performance computing environment, a shell script named `consensus_makefile.sh` is provided. This script performs the following steps:
 
 1. Dynamically sets the project directory.
 
@@ -78,7 +78,7 @@ conda activate newenv
 
 4. Exports the thread count from the `SLURM_CPUS_PER_TASK` environment variable for OpenMP-based programs.
 
-5. Runs the Makefile with the default mapping tool (BBMap).
+5. Runs the `Makefile` with the default mapping tool (BBMap).
 
 The relevant portion of the `consensus_makefile.sh` script is:
 ```bash
