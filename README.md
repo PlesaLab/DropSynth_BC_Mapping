@@ -33,7 +33,7 @@ This repository implements an automated pipeline to process high-throughput Nano
 7. **Consensus Gene Translation** (*process_alt_trans.py*)   
    Translate the consensus gene sequences (nucleotides) into protein sequences (amino acids) using `process_alt_trans.py`, which outputs the results as a CSV file for downstream parsing.  
 
-8. **Map Consensus Genes to Reference Genes** (*run_mapping.py*)
+8. **Map Consensus Genes to Reference Genes** (*run_mapping.py*)   
    Matches (maps) the consensus gene FASTA file (with headers corresponding to consensus barcodes) to the reference genes file (*.genes*) and generates a SAM file for downstream parsing. 
    - Default Mapping: **BBMAP**
    - Can change to use: **MINIMAP**
