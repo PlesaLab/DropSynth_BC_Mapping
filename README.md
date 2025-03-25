@@ -1,6 +1,6 @@
 # DropSynth Barcode Mapping Pipeline
 
-This repository implements an automated pipeline to process high-throughput Nanopore sequencing data associated with barcoded DropSynth gene libraries. The workflow covers steps from splitting large FASTQ files and extracting barcodes to generating consensus gene sequences and determining mutant sequences. The Makefile ties together several Python scripts that each perform a dedicated task in the pipeline.
+This repository implements an automated pipeline to process high-throughput Nanopore sequencing data associated with barcoded DropSynth gene libraries. The workflow covers steps from splitting large FASTQ files and extracting barcodes to generating consensus gene sequences and determining mutant sequences. The Makefile ties together several Python scripts that each perform a dedicated task in the pipeline. The default mapping 
 
 ## Workflow Overview
 
@@ -31,14 +31,17 @@ This repository implements an automated pipeline to process high-throughput Nano
    - A text file listing consensus scores
 
 7. **Consensus Gene Translation** (*process_alt_trans.py*)   
-   Translate the consensus gene nucleotide sequences into protein sequences using `process_alt_trans.py`, which outputs the results as a CSV file for downstream parsing.  
+   Translate the consensus gene sequences (nucleotides) into protein sequences (amino acids) using `process_alt_trans.py`, which outputs the results as a CSV file for downstream parsing.  
 
-8. **SAM File Parsing and Mutation Analysis** (*parse_sam_script.py*)   
-   Finally, the `parse_sam_script.py` script parses a SAM file (default: BBMap) alongside reference protein sequences and barcode information. This step performs pairwise alignments to identify mutations, generate mutant IDs, and output two CSV reports:
-   - Barcode-to-mutant mapping (`C5seqs_mutID_all.csv`)
-   - Aggregated mutant information (`C5seqs_mutID_info_all.csv`)
+8. **Map Consensus Genes to Reference Genes** (*run_mapping.py*)
+   Matches (maps) the consensus gene FASTA file (with headers corresponding to consensus barcodes) to the reference genes file (*.genes*) and generates a SAM file for downstream parsing. 
    - Default Mapping: **BBMAP**
    - Can change to use: **MINIMAP**
+
+9. **SAM File Parsing and Mutation Analysis** (*parse_sam_script.py*)   
+   Finally, the `parse_sam_script.py` script parses a SAM file (default: **BBMap**) using the reference proteins file (*.proteins*) and barcode information. This step performs pairwise alignments to identify mutations, generate mutant IDs, and output two CSV reports:
+   - Barcode-to-mutant mapping csv: `C5seqs_mutID_all.csv`
+   - Aggregated mutant information csv: `C5seqs_mutID_info_all.csv`
 
 ## Dependencies
 
