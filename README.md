@@ -4,7 +4,8 @@ This repository implements an automated pipeline to process high-throughput Nano
 
 ## Workflow Overview
 
-The `Makefile` pipeline consists of the following main steps:
+> [!NOTE]
+> The `Makefile` pipeline consists of the following main steps:
 
 1. **FASTQ File Splitting** (*split_script.py*)   
    Large FASTQ.gz files are split into smaller, more manageable parts using `split_script.py`.
@@ -66,7 +67,8 @@ conda activate newenv
 
 ## Makefile Targets and Running the Pipeline
 
-The workflow is orchestrated via a Makefile. To facilitate running the entire pipeline in a high-performance computing environment, a shell script named `consensus_makefile.sh` is provided. This script performs the following steps:
+> [!NOTE]
+> The workflow is orchestrated via a Makefile. To facilitate running the entire pipeline in a high-performance computing environment, a shell script named `consensus_makefile.sh` is provided. This script performs the following steps:
 
 1. Dynamically sets the project directory.
 
@@ -108,8 +110,8 @@ make -j $SLURM_CPUS_PER_TASK
 # Run only the SAM parser using the MiniMap input
 #make parse_sam_only_minimap
 ```
-
-The `Makefile` itself includes targets for:
+> [!NOTE]
+> The `Makefile` itself includes targets for:
 
 - **Splitting FASTQ files** (`split_script.py`)
 - **Processing barcodes** (`barcode_processing.py`)
