@@ -113,7 +113,7 @@ make -j $SLURM_CPUS_PER_TASK
 # Run only the SAM parser using the MiniMap input
 #make parse_sam_only_minimap
 ```
-> [!NOTE]
+> [!TIP]
 > The `Makefile` itself includes targets for:
 
 - **Splitting FASTQ files** (`split_script.py`)
