@@ -1,131 +1,314 @@
 # DropSynth Barcode Mapping Pipeline
 
-This repository implements an automated pipeline to process high-throughput Nanopore sequencing data associated with barcoded DropSynth gene libraries. The workflow covers steps from splitting large FASTQ files and extracting barcodes to generating consensus gene sequences and determining mutant sequences. The Makefile ties together several Python scripts that each perform a dedicated task in the pipeline. The default mapping 
+This repository implements an automated analysis pipeline for high-throughput Nanopore sequencing data generated from barcoded DropSynth gene libraries. The workflow spans preprocessing of large FASTQ files, barcode extraction and clustering, consensus gene reconstruction, translation, reference mapping, and mutation analysis.
 
-## Workflow Overview
+The pipeline is orchestrated through a `Makefile` that links modular Python scripts, each performing a dedicated stage in the analysis. The default mapping tool is **BBMap**, with optional support for **Minimap2**.
 
-> [!NOTE]
+This repository is intended for research use only.
+
+---
+
+## 🔍 Workflow Overview
+
+> **NOTE**  
 > The `Makefile` pipeline consists of the following main steps:
 
-1. **FASTQ File Splitting** (*split_script.py*)   
-   Large FASTQ.gz files are split into smaller, more manageable parts using `split_script.py`.
+### 1. FASTQ File Splitting (`split_script.py`)
+Large `FASTQ.gz` files are split into smaller, more manageable chunks for parallel processing.
 
-2. **Barcode Extraction and Processing** (*barcode_processing.py*)   
-   The `barcode_processing.py` script reads input FASTQ files, identifies specific barcode regions based on defined motifs, and extracts associated sequences. It outputs:
-   - Barcode statistics (`.bc_stats.csv` and `.bc_stats_for_starcode.tsv`)
-   - A list of barcode-associated sequences (`.bc_list.csv`)
-   - A sorted FASTA file of sequences without ambiguous sites
+### 2. Barcode Extraction and Processing (`barcode_processing.py`)
+Reads input FASTQ files, identifies barcode regions based on defined motifs, and extracts associated sequences.
 
-3. **Barcode Clustering (Starcode)** (*starcode_combine.py*)   
-   An external tool (Starcode) is used to cluster similar barcodes. If multiple clustering output files are generated, they can be merged using `starcode_combine.py` to create a unified consensus barcode count file.
+Outputs:
+- Barcode statistics (`.bc_stats.csv`, `.bc_stats_for_starcode.tsv`)
+- Barcode-associated read list (`.bc_list.csv`)
+- Sorted FASTA file of sequences without ambiguous bases
 
-4. **Assigning Consensus Barcodes** (*add_consensus_bc.py*)   
-   The `add_consensus_bc.py` script takes a FASTA file and the Starcode clustering output. It assigns consensus barcodes to each record (updating the headers) and outputs a new FASTA file.  
+### 3. Barcode Clustering (Starcode) (`starcode_combine.py`)
+Barcodes are clustered using **Starcode**. If multiple clustering output files are generated, they can be merged using `starcode_combine.py` to create a unified consensus barcode count file.
 
-5. **Sorting Consensus Sequences** (*sort_consensus_bc.py*)   
-   The resulting consensus FASTA file is sorted alphabetically by header using `sort_consensus_bc.py` to ensure proper ordering for downstream analysis.
+### 4. Assigning Consensus Barcodes (`add_consensus_bc.py`)
+Assigns consensus barcodes to each FASTA record based on Starcode clustering output and updates sequence headers accordingly.
 
-6. **Consensus Gene Generation** (*get_consensus_gene.py*)   
-   With a sorted FASTA file of consensus barcodes, `get_consensus_gene.py` groups sequences by barcode and aligns them using pyabpoa. For each group, a consensus gene is generated and scored, with results saved as:
-   - A consensus gene FASTA file (headers correspond to consensus barcodes)
-   - A text file listing consensus scores
+### 5. Sorting Consensus Sequences (`sort_consensus_bc.py`)
+Sorts consensus FASTA records alphabetically by header to ensure reproducible ordering for downstream analysis.
 
-7. **Consensus Gene Translation** (*process_alt_trans.py*)   
-   Translate the consensus gene sequences (nucleotides) into protein sequences (amino acids) using `process_alt_trans.py`, which outputs the results as a CSV file for downstream parsing.  
+### 6. Consensus Gene Generation (`get_consensus_gene.py`)
+Sequences are grouped by barcode and aligned using **pyabpoa**. For each barcode group:
+- A nucleotide consensus gene sequence is generated
+- Alignment scores are recorded
 
-8. **Map Consensus Genes to Reference Genes** (*BBMap*)   
-   Matches (maps) the consensus gene FASTA file (with headers corresponding to consensus barcodes) to the reference genes file (*.genes*) and generates a SAM file for downstream parsing. 
-   - Default Mapping: **BBMAP**
-   - Alternative Mapping: **MINIMAP**
+Outputs:
+- Consensus gene FASTA file
+- Consensus score report
 
-9. **SAM File Parsing and Mutation Analysis** (*parse_sam_script.py*)   
-   Finally, the `parse_sam_script.py` script parses a SAM file (default: **BBMap**) using the reference proteins file (*.proteins*) and barcode information. This step performs pairwise alignments to identify mutations, generate mutant IDs, and output two CSV reports:
-   - Barcode-to-mutant mapping csv: `C5seqs_mutID_all.csv`
-   - Aggregated mutant information csv: `C5seqs_mutID_info_all.csv`
+### 7. Consensus Gene Translation (`process_alt_trans.py`)
+Translates consensus nucleotide sequences into amino acid sequences and exports results as a CSV file for downstream parsing.
 
-## Dependencies
+### 8. Map Consensus Genes to Reference Genes (BBMap / Minimap2)
+Consensus gene sequences are mapped to the reference gene set (`*.genes`) to generate a SAM file for downstream mutation parsing.
 
-> [!NOTE]
-> This pipeline uses the following dependencies, which can be installed via Conda using the provided `environment.yml` file:
+- Default: **BBMap**
+- Alternative: **Minimap2**
 
-- **Python 3.9**
-- **biopython** – for sequence handling and FASTA/FASTQ parsing
-- **pandas** – for data manipulation
-- **numpy** – for numerical operations
-- **regex** – for flexible motif matching
-- **starcode 1.4** – for clustering similar barcodes
-- **minimap2 2.28** – for read mapping (alternative to BBMap)
-- **samtools 1.21** – for SAM/BAM file processing
-- **bbmap 39.17** – for read mapping (default mapping tool)
+### 9. SAM File Parsing and Mutation Analysis (`parse_sam_script.py`)
+Parses SAM files using:
+- Reference protein file (`*.proteins`)
+- Barcode assignments
 
-Additionally, the following pip packages are installed:
-- **edlib** – for sequence alignment
-- **pyabpoa** – for multiple sequence alignment in consensus gene generation
+Performs pairwise alignments to:
+- Identify mutations
+- Assign mutant IDs
+- Generate aggregated mutation summaries
 
-To set up the environment, run:
+Outputs:
+- Barcode-to-mutant mapping: `C5seqs_mutID_all.csv`
+- Aggregated mutant information: `C5seqs_mutID_info_all.csv`
+
+---
+
+## 📥 Input File Requirements
+
+The pipeline requires the following inputs:
+
+### Raw Sequencing Data
+- `*.fastq.gz` — Nanopore sequencing reads
+
+### Reference Design Files
+- `*.genes` — reference nucleotide design sequences
+- `*.proteins` — reference amino acid sequences
+
+The `.genes` file is used for nucleotide mapping, while `.proteins` is used during mutation classification and amino acid comparisons.
+
+---
+
+## 📤 Output Structure
+
+The pipeline produces intermediate and final outputs organized by analysis stage.
+
+### Barcode-Level Outputs
+- `*.bc_stats.csv`
+- `*.bc_list.csv`
+- `*.bc_consensus.fasta`
+
+### Consensus Gene Outputs
+- `*.consensus_gene.fasta`
+- `*.consensus_scores.txt`
+- `*.translated.csv`
+
+### Mapping Outputs
+- `*.sam`
+
+### Mutation Reports
+- `C5seqs_mutID_all.csv`
+- `C5seqs_mutID_info_all.csv`
+
+These outputs serve as primary inputs for downstream QC analysis, mutation frequency estimation, and library performance evaluation.
+
+---
+
+## 💻 Dependencies
+
+This pipeline relies on Conda-managed dependencies defined in `environment.yml`.
+
+### Core Dependencies
+- Python 3.9
+- biopython
+- pandas
+- numpy
+- regex
+
+### External Tools
+- starcode 1.4
+- minimap2 2.28
+- samtools 1.21
+- bbmap 39.17
+
+### Pip Packages
+- edlib
+- pyabpoa
+
+### Environment Setup
+
 ```bash
 conda env create -f environment.yml
 conda activate newenv
 ```
 
-## Makefile Targets and Running the Pipeline
+---
 
-> [!NOTE]
-> The workflow is orchestrated via a `Makefile`. To facilitate running the entire pipeline in a high-performance computing environment, a shell script named `consensus_makefile.sh` is provided. This script performs the following steps:
+## 🚀 Running the Pipeline
 
-1. Dynamically sets the project directory.
+The workflow is executed via a `Makefile`, with HPC support provided through `consensus_makefile.sh`.
 
-2. Loads necessary modules (e.g., `miniconda3`).
+### consensus_makefile.sh Overview
 
-3. Activates the Conda environment (`newenv`).
+This script:
+1. Sets the project directory
+2. Loads required modules
+3. Activates the Conda environment
+4. Sets thread counts from SLURM
+5. Runs the pipeline
 
-4. Exports the thread count from the `SLURM_CPUS_PER_TASK` environment variable for OpenMP-based programs.
-
-5. Runs the `Makefile` with the default mapping tool (BBMap).
-
-The relevant portion of the `consensus_makefile.sh` script is:
 ```bash
-# Set the project directory dynamically to the script's location
+# Set project directory
 PROJ_DIR=$(pwd)
 cd "$PROJ_DIR"
 
-# Load necessary modules
+# Load modules
 module purge
 module load miniconda3
 
-# Activate the Conda environment
+# Activate environment
 conda activate newenv
 
-# Set number of threads for OpenMP-based programs
+# Thread configuration
 export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
-
-# Export thread count for use in Makefile
 export THREAD_COUNT=$SLURM_CPUS_PER_TASK
 
-###---- Leave as is if you want to use BBMap ---------------------
-# Run the Makefile with MAPPING_TOOL=bbmap (default)
+# Run with BBMap (default)
 make -j $SLURM_CPUS_PER_TASK
 
-###---- Uncomment if you want to use MiniMap instead of BBMap-----
-# Run the Makefile with MAPPING_TOOL=minimap
-#make -j $SLURM_CPUS_PER_TASK MAPPING_TOOL=minimap
-
-# Run only the SAM parser using the MiniMap input
-#make parse_sam_only_minimap
+# Alternative: MiniMap
+# make -j $SLURM_CPUS_PER_TASK MAPPING_TOOL=minimap
 ```
-> [!TIP]
-> The `Makefile` itself includes targets for:
 
-- **Splitting FASTQ files** (`split_script.py`)
-- **Processing barcodes** (`barcode_processing.py`)
-- **Clustering barcodes with Starcode** ('starcode_combine.py')
-- **Assigning consensus barcodes** (`add_consensus_bc.py`)
-- **Sorting consensus barcodes** (`sort_consensus_bc.py`)
-- **Generating consensus gene sequences** (`get_consensus_gene.py`)
-- **Translating consensus gene sequences** (`process_alt_trans.py`)
-- **Parsing SAM files for perfect and mutant variants** (`parse_sam_script.py`)
+### Submitting as SLURM job
 
-To run the full pipeline, simply execute the `consensus_makefile.sh` script. In an HPC environment, submit this script as a batch job where `SLURM_CPUS_PER_TASK` defines the number of threads available.
 ```bash
 sbatch consensus_makefile.sh
 ```
+
+### Makefile Targets
+
+The `Makefile` contains targets for each pipeline stage:
+- FASTQ splitting
+- Barcode processing
+- Starcode clustering
+- Consensus barcode assignment
+- FASTA sorting
+- Consensus gene generation
+- Translation
+- SAM parsing
+
+Users may run individual stages if needed for debugging or iterative analysis.
+
+---
+
+## 🗂️ Configuration and Customization
+
+### Mapping Tool Selection
+
+Default:
+
+```bash
+make
+```
+
+Minimap:
+
+```bash
+make MAPPING_TOOL=minimap
+```
+
+### Thread Control
+
+```bash
+export THREAD_COUNT=<N>
+```
+
+In SLURM:
+
+```bash
+$SLURM_CPUS_PER_TASK
+```
+
+### Barcode Definitions and Filtering
+
+Parameters for:
+- motif detection
+- trimming
+- filtering thresholds
+
+are defined in:
+- `barcode_processing.py`
+- `parse_sam_script.py`
+
+These can be modified for:
+- alternative barcode architectures
+- new library formats
+- updated filtering criteria
+
+---
+
+## 🏗️ Performance Notes
+
+- **BBMAP** provides high sensitivity for synthetic constructs with low divergence
+- **Minimap2** offers faster mapping for very large datasets (and longer constructs)
+- **pyabpoa** improves consensus accuracy for noisy Nanopore reads
+
+Runtime depends on:
+- total read depth
+- barcode diversity
+- thread availability
+
+Recommended resources for large libraries (>10k barcodes):
+- ≥64 GB RAM
+- ≥16 CPU threads
+
+---
+
+## 🛠️ Troubleshooting
+
+### Conda Environment Issues
+
+```bash
+conda env remove -n newenv
+conda env create -f environment.yml
+conda activate newenv
+```
+
+### Starcode Not Found
+
+```bash
+which starcode
+```
+
+### Empty Consensus Outputs
+
+Possible causes:
+- incorrect barcode motif definition
+- excessive filtering
+- failed barcode clustering
+
+### Low Mapping Rates
+
+Check:
+- reference gene file correctness
+- mapping tool selection
+- read orientation and trimming parameters
+
+---
+
+## 🔁 Reproducibility
+
+This pipeline is designed for reproducible analysis of DropSynth barcoded libraries.
+
+Key reproducibility features:
+- deterministic FASTA sorting
+- modular scripts with defined inputs/outputs
+- Makefile-driven orchestration
+- 1environment.yml1 for dependency locking
+
+---
+
+## 📄 License
+
+This repository is released under an academic-use license. See `LICENSE` for details.
+
+---
+
+## ⚙️ Maintainers
+ 
+- Karl Romanowicz (krom@uoregon.edu)
+- Calin Plesa (calin@uoregon.edu)
