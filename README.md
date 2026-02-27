@@ -72,7 +72,12 @@ Outputs:
 **Clone the Repo**
 
 ```bash
+# SSH Clone
 git clone git@github.com:PlesaLab/DropSynth_BC_Mapping.git
+cd DropSynth_BC_Mapping
+
+# HTML Clone
+git clone https://github.com/PlesaLab/DropSynth_BC_Mapping.git
 cd DropSynth_BC_Mapping
 ```
 
