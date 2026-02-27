@@ -67,6 +67,17 @@ Outputs:
 
 ---
 
+## 🚀 Installation & Setup
+
+**Clone the Repo**
+
+```bash
+git clone git@github.com:PlesaLab/DropSynth_BC_Mapping.git
+cd DropSynth_BC_Mapping
+```
+
+---
+
 ## 📥 Input File Requirements
 
 The pipeline requires the following inputs:
